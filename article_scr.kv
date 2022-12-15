@@ -1,0 +1,114 @@
+<ArticleScreen@MDScreen>:
+    name: "art_scr"
+    id : art_scr
+    on_enter : sv.scroll_y = 1
+
+    ScrollView:
+        id : sv
+        size_hint: (1, None)
+        size : (art_scr.width,art_scr.height)
+        MDGridLayout:
+            cols:1 #orientation: "vertical"
+            size_hint_y : None
+            default_size_hint: 1, None
+            height : self.minimum_height
+            padding : 10
+            spacing : 10
+
+            MDLabel:
+                markup: True
+                padding_y : 10
+                id : title_lb
+                size_hint_y : None
+                halign: "center"
+            OneLineListItem:
+                id : cat_lb
+            AsyncImage:
+                source: ""
+                id : image
+                size_hint_y : None
+                height : 300
+            MDBoxLayout:
+                orientation: "vertical"
+                size_hint: 1, None
+                height: text_lb.texture_size[1]
+
+                MDLabel:
+                    id: text_lb
+                    markup: True
+                    #size_hint_y : None
+                    text_size: self.width, None
+                    height: self.texture_size[1]
+
+
+            MDGridLayout:
+                cols:1 #orientation: "vertical"
+                size_hint_y : None
+                default_size_hint: 1, None
+                height : self.minimum_height
+                padding : 10
+                spacing : 10
+                margin : 10
+                id : comment_grid
+            MDFlatButton:
+                color : "orange"
+                text: "Commenta"
+                on_press: app.show_comment_dialog()
+
+
+<CommentBox>
+    orientation: "vertical"
+    spacing: "12dp"
+    size_hint_y: None
+    height: nom.height + ema.height +com.height
+    on_size: root.height  = self.height
+    id  : cb
+    max_size : app.root.ids.art_scr.size
+    MDTextField:
+        id : nom
+        hint_text: "Nome"
+        required: True
+        helper_text: "Inserisci il nome col quale commentare"
+    MDTextField:
+        id : ema
+        hint_text: "Email"
+        required: True
+        helper_text: "Inserisci la tua mail (non apparirà nei commenti)"
+    MDTextField:
+        on_text : cb.parent.height = root.height
+        id : com
+        hint_text: "Commento"   
+        required: True
+        multiline : True
+
+
+
+
+
+
+
+<Comment>
+    id : comment_card
+    margin: 5
+    size_hint: 1, None
+    #size: "200dp", "100dp"
+    height : name.size[1] + label.size[1]
+
+    MDRelativeLayout:
+        padding : 10
+
+        OneLineListItem:
+            id: name
+            text:"[b]"+root.auth+"[/b]"
+            pos_hint: {"top": 1}
+
+        MDLabel:
+            markup : True
+            padding : 5, 5
+            id: label
+            text : "[i]"+root.text+"[/i]"
+            adaptive_size: True
+            #color: "gray"
+            multiline: True            
+            text_size: comment_card.width, None
+            size: self.texture_size

@@ -1,0 +1,80 @@
+
+
+<DrawerClickableItem@MDNavigationDrawerItem>
+    focus_color: "#e7e4c0"
+    text_color: "#4a4939"
+    icon_color: "#4a4939"
+    ripple_color: "#c5bdd2"
+    selected_color: "#0c6c4d"
+
+
+<DrawerLabelItem@MDNavigationDrawerItem>
+    text_color: "#4a4939"
+    icon_color: "#4a4939"
+    focus_behavior: False
+    selected_color: "#4a4939"
+    _no_ripple_effect: True
+
+<MainScreen>:
+
+    MDTopAppBar:
+        id : topbar
+        pos_hint: {"top": 1}
+        elevation: 4
+        title: "Manifesto Sardo"
+        left_action_items: [["menu", lambda x: nav_drawer.set_state("open")]] if screen_manager.current == "bro_scr" else [["arrow-left", lambda x:app.go_back()]]
+        source : "src/header.png"
+        canvas.before:
+            Rectangle:
+                pos: self.pos
+                size: self.size
+                source : "src/header.png"
+
+    MDNavigationLayout:
+        size_hint_y: 1.0 - topbar.height/root.height
+        MDScreenManager:
+            id: screen_manager
+
+            BrowseScreen:
+                id: bro_scr
+            ArticleScreen:
+                id : art_scr
+            Screen3:
+
+        MDNavigationDrawer:
+
+            id: nav_drawer
+            radius: (0, 16, 16, 0)
+
+            MDNavigationDrawerMenu:
+
+                MDNavigationDrawerHeader:
+                    title: "MyMenu"
+                    title_color: "#4a4939"
+                    #text: "Header text"
+                    spacing: "4dp"
+                    padding: "12dp", 0, 0, "56dp"
+
+      
+                DrawerClickableItem:
+                    #icon: "gmail"
+                    #right_text: "+99"
+                    #text_right_color: "#4a4939"
+                    text: "Articoli"
+                    on_release: 
+                        screen_manager.current = "bro_scr"
+                        nav_drawer.set_state("close")
+
+                DrawerClickableItem:
+                    #icon: "send"
+                    text: "Screen 3"
+                    on_release: 
+                        screen_manager.current = "screen3"
+                        nav_drawer.set_state("close")
+
+
+                MDNavigationDrawerDivider:
+
+                DrawerLabelItem:
+                    icon: "information-outline"
+                    text: "Info"

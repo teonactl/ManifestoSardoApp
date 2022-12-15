@@ -1,0 +1,6 @@
+bin/
+.buildozer/
+articolo.html
+__pycache__
+shimserver.py
+buildozer.spec

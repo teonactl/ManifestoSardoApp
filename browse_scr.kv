@@ -1,0 +1,69 @@
+<BrowseScreen@MDScreen>:
+    name: "bro_scr"
+    id : bro_scr
+    RecycleViewer : 
+        viewclass: 'MyCard'  
+        orientation: "vertical"
+        padding:10, 10
+        margin : 20
+        #space_x: self.size[0]/3 
+        size_hint_y : self.parent.size_hint_y
+        id : rv
+
+        RecycleGridLayout:
+            color:(0, 0.7, 0.4, 0.8)
+            default_size: None, dp(500)
+            default_size_hint: 1, None
+            padding : (10,10)
+            size_hint_y: None
+            height: self.minimum_height
+            cols: 1
+            spacing: 10
+
+
+<MyCard>
+    id : card
+    style : "elevated"
+    shadow_softness: 12
+    shadow_offset : (0, 2)
+    orientation : "vertical"
+    margin : 10
+    padding : 10
+    line_color : "yellow"
+    #height : self.height + text_lb.height
+    ThreeLineListItem:
+        text : root.date
+        secondary_text:f"[b]{root.auth}[/b]"
+        tertiary_text: root.title
+        pos_hint: {"center_y": .5}
+        _no_ripple_effect: True
+        multiline : True
+        padding_y : 10
+    MDBoxLayout:
+        orientation : "vertical"
+        padding : 10
+        MDSmartTile:
+            padding_y : 10
+            source : root.img
+            size_hint_y:1
+            allow_stretch: False
+            mipmap:True
+            keep_ratio:True
+            no_cache : False
+            on_press: app.open_article(root.link, root.title, root.cat, root.img)
+            lines : 1
+      
+            MDLabel:
+                markup : True
+                radius : 24, 24
+                text_color :"c77005"
+                text : f"[b][color=c77005]{root.cat}[/color][/b]"
+                #pos_hint: {"center_y": .5}
+                _no_ripple_effect: True          
+
+        MDLabel:
+            id : text_lb
+            markup: True
+            text : root.text
+            height: self.texture_size[1]
+
