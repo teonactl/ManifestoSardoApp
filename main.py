@@ -297,11 +297,8 @@ class ManifestoApp(MDApp):
         self.root.ids.art_scr.ids.image.source  = img
         labels = text.split("\n\n")
         for l in labels:
-            print(l)
-            L =   MyLab(
-                    text = l        
-                    )
-
+            #print(l)
+            L =   MyLab( text = l)
             self.root.ids.art_scr.ids.labelbase.add_widget(L)
         self.root.ids.art_scr.ids.comment_grid.clear_widgets()
 
