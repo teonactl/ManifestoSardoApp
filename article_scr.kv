@@ -30,18 +30,15 @@
                 id : image
                 size_hint_y : None
                 height : 300
-            MDBoxLayout:
-                orientation: "vertical"
+            MDGridLayout:
+                cols: 1 #orientation: "vertical"
                 size_hint: 1, None
-                height: text_lb.texture_size[1]
+                size_hint_y : None
+                default_size_hint: 1, None
+                height : self.minimum_height
+                id :labelbase
 
-                MDLabel:
-                    font_name : "Roboto"
-                    id: text_lb
-                    markup: True
-                    #size_hint_y : None
-                    text_size: self.width, None
-                    height: self.texture_size[1]
+               
 
 
             MDGridLayout:
@@ -56,14 +53,23 @@
 
                 
 
-            MDRaisedButton:
+            MDFlatButton:
                 halign : "center"
                 x: (root.width / 2) + (self.width/2)
                 y : 10
-                color : "yellow"
+                theme_text_color: 'Custom'
+                md_bg_color: app.theme_cls.primary_color
                 text: "Commenta"
                 on_press: app.show_comment_dialog()
 
+
+<MyLab@MDLabel>:
+    font_name : "Roboto"
+    id: text_lb
+    markup: True
+    size_hint :1, None
+    text_size: self.width, None
+    height: self.texture_size[1]
 
 <CommentBox>
     orientation: "vertical"

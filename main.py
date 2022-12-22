@@ -11,6 +11,7 @@ from datetime import datetime, date
 from kivy.clock import  mainthread, Clock
 from kivymd.toast import toast
 from kivymd.uix.snackbar import Snackbar
+from kivymd.uix.label import MDLabel
 
 from kivymd.uix.button import MDFlatButton, MDIconButton
 from kivymd.uix.dialog import MDDialog
@@ -153,7 +154,8 @@ class CommentBox(MDCard):
     pass
 class Info(MDBoxLayout):
     text = StringProperty(info_string)
-
+class MyLab(MDLabel):
+    pass
 class ManifestoApp(MDApp):
     def build(self):
         self.theme_cls.primary_palette = "Amber"
@@ -293,7 +295,14 @@ class ManifestoApp(MDApp):
         self.root.ids.art_scr.ids.cat_aut_lb.text  = f"[b]{aut.strip()}[/b]"
         self.root.ids.art_scr.ids.cat_aut_lb.secondary_text  = cat
         self.root.ids.art_scr.ids.image.source  = img
-        self.root.ids.art_scr.ids.text_lb.text  =text
+        labels = text.split("\n\n")
+        for l in labels:
+            print(l)
+            L =   MyLab(
+                    text = l        
+                    )
+
+            self.root.ids.art_scr.ids.labelbase.add_widget(L)
         self.root.ids.art_scr.ids.comment_grid.clear_widgets()
 
         if not len(comments):
