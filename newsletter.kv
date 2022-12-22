@@ -1,0 +1,21 @@
+<NewsLetterScreen@MDScreen>:
+    name: "nl_scr"
+    id : nl_scr
+    ScrollView:
+        size_hint: (1, None)
+        size : (nl_scr.width,nl_scr.height)
+        MDGridLayout:
+            cols:1 
+            size_hint_y : None
+            height : self.minimum_height
+            padding : 50
+            spacing : 100
+            #margin_top : 100
+            MDLabel:
+                markup: True
+                text: "\n\n\n[b]Iscriviti alla newsletter del Manifesto Sardo[/b]\n\nRimani aggiornato sulle nuove pubblicazioni e sulle nostre iniziative."
+            MDTextField:
+                hint_text: "la tua email"
+                helper_text: "Iscriviti alla nostra newsletter"
+                helper_text_mode: "on_focus"
+                on_text_validate : app.subscribe(self.text)

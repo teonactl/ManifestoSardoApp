@@ -1,6 +1,21 @@
 <RedaScreen@MDScreen>:
     name: "red_scr"
     id : red_scr
-
-    MDLabel:
-        text:"""Redazione\n\n\nDirettore responsabile\n\nRoberto Loddo\n\nCoordinamento di redazione\n\nMarco LigasRoberto Loddo"""
+    ScrollView:
+        size_hint: (1, None)
+        size : (red_scr.width,red_scr.height)
+        MDGridLayout:
+            cols:1 
+            #size_hint_y : None
+            height : self.minimum_height
+            padding : 10
+            spacing : 10
+            Image :
+                source : "src/header.png"
+            MDLabel:
+                markup: True
+                padding_y : 10
+                #size_hint_y : None
+                halign: "center"
+                text: app.redstr
+                adaptive_height: True

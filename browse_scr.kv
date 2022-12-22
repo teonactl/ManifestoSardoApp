@@ -12,7 +12,7 @@
 
         RecycleGridLayout:
             color:(0, 0.7, 0.4, 0.8)
-            default_size: None, None #dp(500)
+            default_size: None, dp(650)
             default_size_hint: 1, None
             padding : (10,10)
             size_hint_y: None
@@ -23,29 +23,33 @@
 
 <MyCard>
     id : card
-    style : "elevated"
-    shadow_softness: 12
-    shadow_offset : (0, 2)
-    orientation : "vertical"
+    orientation: "vertical"
     margin : 10
     padding : 10
+    elevation : -1
     line_color : "yellow"
-    on_press : print(tex.height+smt.height, text_lb.texture_size[1])
-    height: 418+ text_lb.texture_size[1]
-    ThreeLineListItem:
+    #on_press : print(tex.height+smt.height, text_lb.height)
+    TwoLineListItem:
         id : tex
         text : root.date
         secondary_text:f"[b]{root.auth}[/b]"
-        tertiary_text: root.title
         pos_hint: {"center_y": .5}
         _no_ripple_effect: True
         multiline : True
         padding_y : 10
+    MDLabel:
+        markup: True
+        padding_y : 10
+        size_hint_y : None
+        halign: "center"
+        text: f"[b][color=c77005]{root.title}[/color][/b]"
+
     MDBoxLayout:
         id :smt
         orientation : "vertical"
         padding : 10
         MDSmartTile:
+            id : img
             padding_y : 10
             source : root.img
             size_hint_y:1
@@ -59,10 +63,17 @@
             MDLabel:
                 markup : True
                 radius : 24, 24
-                text_color :"c77005"
-                text : f"[b][color=c77005]{root.cat}[/color][/b]"
+                theme_text_color: "Custom"
+                text_color: app.theme_cls.primary_color
+                text : f"[b]{root.cat}[/b]"
                 #pos_hint: {"center_y": .5}
-                _no_ripple_effect: True          
+                _no_ripple_effect: True   
+                opposite_colors :True
+            MDIconButton:
+                theme_text_color: "Custom"
+                text_color: app.theme_cls.primary_color
+                icon: "share-variant-outline"
+                on_press: app.share("Manifesto Sardo",root.link)       
 
         MDLabel:
             id : text_lb

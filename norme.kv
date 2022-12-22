@@ -1,0 +1,23 @@
+<NormeScreen@MDScreen>:
+    name: "nor_scr"
+    id : nor_scr
+    ScrollView:
+        size_hint: (1, None)
+        size : (nor_scr.width,nor_scr.height)
+
+        MDGridLayout:
+            height : self.minimum_height
+            cols:1 
+            size_hint_y : None
+
+            padding : 10
+            spacing : 10
+            Image :
+                source : "src/header.png"
+            MDLabel:
+                markup: True
+                padding_y : 10
+                #size_hint_y : None
+                halign: "center"
+                text: app.normestr
+                adaptive_height: True

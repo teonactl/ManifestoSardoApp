@@ -15,14 +15,16 @@
             padding : 10
             spacing : 10
 
+
+            TwoLineListItem:
+                id : cat_aut_lb
             MDLabel:
+                id : title_id
                 markup: True
                 padding_y : 10
                 id : title_lb
                 size_hint_y : None
                 halign: "center"
-            TwoLineListItem:
-                id : cat_aut_lb
             AsyncImage:
                 source: ""
                 id : image
@@ -51,8 +53,14 @@
                 spacing : 10
                 margin : 10
                 id : comment_grid
-            MDFlatButton:
-                color : "orange"
+
+                
+
+            MDRaisedButton:
+                halign : "center"
+                x: (root.width / 2) + (self.width/2)
+                y : 10
+                color : "yellow"
                 text: "Commenta"
                 on_press: app.show_comment_dialog()
 
@@ -68,18 +76,15 @@
     MDTextField:
         id : nom
         hint_text: "Nome"
-        required: True
         helper_text: "Inserisci il nome col quale commentare"
     MDTextField:
         id : ema
         hint_text: "Email"
-        required: True
         helper_text: "Inserisci la tua mail (non apparirà nei commenti)"
     MDTextField:
         on_text : cb.parent.height = root.height
         id : com
         hint_text: "Commento"   
-        required: True
         multiline : True
 
 

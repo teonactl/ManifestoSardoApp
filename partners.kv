@@ -1,0 +1,128 @@
+<PartScreen@MDScreen>:
+    name: "par_scr"
+    id : par_scr
+    ScrollView:
+        size_hint: (1, None)
+        size : (par_scr.width,par_scr.height)
+
+        MDGridLayout:
+            size_hint_y : None
+
+            height : self.minimum_height
+            cols:1 
+            size_hint_y : None
+            padding : 10
+            spacing : 10
+            MDSmartTile:
+                size_hint_y : None
+                padding_y : 10
+                source : "src/grig.png"
+                mipmap:True
+                no_cache : False
+                on_press: app.wb("https://gruppodinterventogiuridicoweb.com/")
+                lines : 1
+            
+                MDLabel:
+                    markup : True
+                    radius : 24, 24
+                    text_color :"c77005"
+                    text : f"[b][color=c77005]Gruppo Intervento Giuridico[/color][/b]"
+                    #pos_hint: {"center_y": .5}
+                    _no_ripple_effect: True          
+            MDSmartTile:
+                size_hint_y : None
+                padding_y : 10
+                source : "src/arci.png"
+                allow_stretch: False
+                mipmap:True
+                keep_ratio:True
+                no_cache : False
+                on_press: app.wb("https://www.arci.it/")
+                lines : 1
+            
+                MDLabel:
+                    markup : True
+                    radius : 24, 24
+                    text_color :"c77005"
+                    text : f"[b][color=c77005]ARCI - Sardegna[/color][/b]"
+                    #pos_hint: {"center_y": .5}
+                    _no_ripple_effect: True          
+            MDSmartTile:
+                size_hint_y : None
+
+                padding_y : 10
+                source : "src/stop_opg.png"
+                allow_stretch: False
+                mipmap:True
+                keep_ratio:True
+                no_cache : False
+                on_press: app.wb("https://www.stopopg.it/")
+                lines : 1
+            
+                MDLabel:
+                    markup : True
+                    radius : 24, 24
+                    text_color :"c77005"
+                    text : f"[b][color=c77005]StopOPG[/color][/b]"
+                    #pos_hint: {"center_y": .5}
+                    _no_ripple_effect: True         
+            MDSmartTile:
+                size_hint_y : None
+
+                padding_y : 10
+                source : "src/il_manifesto.png"
+                allow_stretch: False
+                mipmap:True
+                keep_ratio:True
+                no_cache : False
+                on_press: app.wb("https://www.ilmanifesto.it/")
+                lines : 1
+            
+                MDLabel:
+                    markup : True
+                    radius : 24, 24
+                    text_color :"c77005"
+                    text : f"[b][color=c77005]Il Manifesto[/color][/b]"
+                    #pos_hint: {"center_y": .5}
+                    _no_ripple_effect: True          
+            MDSmartTile:
+                size_hint_y : None
+
+                padding_y : 10
+                source : "src/manifesto_bologna.png"
+                allow_stretch: False
+                mipmap:True
+                keep_ratio:True
+                no_cache : False
+                #on_press: app.wb("https://www.stopopg.it/")
+                lines : 1
+            
+                MDLabel:
+                    markup : True
+                    radius : 24, 24
+                    text_color :"c77005"
+                    text : f"[b][color=c77005]Circoli Manifesto Bologna[/color][/b]"
+                    #pos_hint: {"center_y": .5}
+                    _no_ripple_effect: True          
+                                 
+            MDSmartTile:
+                size_hint_y : None
+
+                padding_y : 10
+                source : "src/sbilanciamoci.png"
+                allow_stretch: False
+                mipmap:True
+                keep_ratio:True
+                no_cache : False
+                on_press: app.wb("https://sbilanciamoci.info/")
+
+                lines : 1
+            
+                MDLabel:
+                    markup : True
+                    radius : 24, 24
+                    text_color :"c77005"
+                    text : f"[b][color=c77005]Sbilanciamoci[/color][/b]"
+                    #pos_hint: {"center_y": .5}
+                    _no_ripple_effect: True          
+                                 

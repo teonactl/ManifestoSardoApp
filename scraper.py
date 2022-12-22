@@ -18,9 +18,7 @@ def article_scraper( a_name=False, url = False):
 
 	soup = BeautifulSoup(page.content, "html.parser")
 	form = soup.find("form")
-	#print(form.find_all("input"))
 	articlehtml = soup.find("div", class_="post")
-	l = []
 	com_ol= soup.find("ol", class_="commentlist")
 	comments = []
 
@@ -32,20 +30,8 @@ def article_scraper( a_name=False, url = False):
 			co["auth"] = c.find("cite").text
 			co["text"] = "\n\n".join([x.text for x in  c.find_all("p")])
 			comments.append(co)
-	p_list = articlehtml.find_all(["p"])
-	print(p_list)
-	t = "".join([p.text for p in p_list])
-
-	if not len(t.strip()) :
-		p_list = articlehtml.find_all("div")
-		p_list = [p_list[0]]
-	#print("AUT_>",aut)
-	for i in p_list:
-		l.append( md(i,strip=['a','img']))
-	#print(l)
-	nl = list( dict.fromkeys(l) )
-	#print(comments)
-	article = "\n\n".join(nl)
+	entry =  articlehtml.find("div", class_="entry")
+	article = md(entry,strip=['a','img']) 
 	secret = {}
 	sec_list = ["submit","comment_post_ID","wantispam_t"]
 	inputs = [ i for i in form.find_all("input") if i["name"] in  sec_list]
@@ -53,17 +39,25 @@ def article_scraper( a_name=False, url = False):
 		secret[sec_list.pop(0)] = "+".join(i["value"].split(" "))
 	catcont = articlehtml.find("div",class_="postmetadata alt")
 	cat =catcont.find("a",rel="category tag")
-	#print("cat-->", cat.text)
 	img = articlehtml.find("img")["src"]
-	#print("Img", img)
-	return article, comments , secret, cat.text, img
+	#print("Article:-> " ,article)
+
+	aut = article.split("\n\n")[1].replace("[", "").replace("]","").replace("**","").replace("#","")
+	if len(aut)> 34 or "foto" in aut.lower() or "immagine" in aut.lower():
+		aut =article.split("\n\n")[2].replace("[", "").replace("]","").replace("**","").replace("#","")
+	#print("Aut->", aut)
+	return aut, article, comments , secret, cat.text, img
 
 #article_scraper()
+from kivymd.toast import toast
 
 
 
 def timeline_scraper(page = ""):
-	page = requests.get("https://www.manifestosardo.org/page/"+page)
+	try:
+		page = requests.get("https://www.manifestosardo.org/page/"+page)
+	except:
+		return toast("Controlla la connessione e riavvia l'App!")
 	soup = BeautifulSoup(page.content, "html.parser")
 	articlelist = soup.find_all("div", class_="post")
 	a_list = []
@@ -140,8 +134,11 @@ def timeline_scraper(page = ""):
 #p = timeline_scraper("300")
 #print(p)
 
-def search_scraper(query=""):
-	sr_url = "https://www.manifestosardo.org/?s="+ "+".join(query.split(" "))
+def search_scraper(query,page):
+	page = str(page)
+	query = "+".join(query.split(" "))
+	sr_url = "https://www.manifestosardo.org/page/"+page+"/?s="+ query
+	print(sr_url)
 	page = requests.get(sr_url)
 	soup = BeautifulSoup(page.content, "html.parser")
 	articlelist = soup.find_all("div", class_="post")
@@ -164,6 +161,7 @@ def search_scraper(query=""):
 		#print("link: ",entry["href"])
 		#print("date: ",d.text)
 		a_list.append(art)
+	#print(a_list)
 	return a_list
 
 

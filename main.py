@@ -8,7 +8,7 @@ from kivy.core.window import Window
 import kivy
 import scraper
 from datetime import datetime, date
-from kivy.clock import  mainthread
+from kivy.clock import  mainthread, Clock
 from kivymd.toast import toast
 from kivymd.uix.snackbar import Snackbar
 
@@ -18,13 +18,19 @@ from kivymd.uix.boxlayout import MDBoxLayout
 from kivymd.uix.textfield import MDTextField
 
 from kivy.core.text import LabelBase
+from kivymd.uix.dialog import MDDialog
+from kivy import platform
 
 import requests
 import threading
 import re
+from utils import *
 import ssl
 ssl._create_default_https_context = ssl._create_unverified_context
-
+import webbrowser
+if platform == 'android':
+    from jnius import autoclass   
+    
 LabelBase.register(name='Roboto',fn_regular='src/roboto-slab/RobotoSlab-Regular.ttf',fn_italic="src/roboto-slab/RobotoSlab-Thin.ttf", fn_bold = "src/roboto-slab/RobotoSlab-Bold.ttf")
 
 @mainthread
@@ -34,11 +40,14 @@ Builder.load_file("browse_scr.kv")
 Builder.load_file("article_scr.kv")
 Builder.load_file("search_scr.kv")
 Builder.load_file("redazione.kv")
+Builder.load_file("newsletter.kv")
+Builder.load_file("norme.kv")
+Builder.load_file("associazione.kv")
+Builder.load_file("partners.kv")
 
 if kivy.platform == "linux":
     Window.size = (450, 740)
     #Window.size = (740,450)
-
 
 
 
@@ -107,23 +116,19 @@ class SearchViewer(RecycleView):
     def __init__(self, **kwargs):
         super(SearchViewer, self).__init__(**kwargs)
         self.page_index = 1
-        data = scraper.timeline_scraper(str(self.page_index))
-        data.sort(key=lambda r: r["datetime"], reverse=True)
+        data = scraper.search_scraper(query = MDApp.get_running_app().a_query,page = str(self.page_index))
+        #data.sort(key=lambda r: r["datetime"], reverse=True)
         self.data = data 
         self.lastrun =  datetime.now()
 
 
     def add_page(self):
-        m_toast("Caricando articoli precedenti...")
+        m_toast("Caricando risultati precedenti...")
         self.page_index += 1
-        new_data = scraper.timeline_scraper(str(self.page_index))
+        new_data = scraper.search_scraper(query = MDApp.get_running_app().a_query,page = str(self.page_index))
         old_len = len(self.data)
-        self.data =self.data + new_data
-        self.data.sort(key=lambda r: r["datetime"], reverse=True)
-        #print("Scraping ", str(self.page_index))
-        #scroll_index =  1- (old_len/ (len(self.data)+old_len)) 
+        self.data =self.data + new_data 
         scroll_index = 1- (old_len / (old_len+ len(new_data)) )
-        #print("Scrolling to ", scroll_index)
         self.scroll_y = scroll_index
 
     def on_scroll_move(self, *args) :
@@ -146,6 +151,9 @@ class Comment(MDCard):
 
 class CommentBox(MDCard):
     pass
+class Info(MDBoxLayout):
+    text = StringProperty(info_string)
+
 class ManifestoApp(MDApp):
     def build(self):
         self.theme_cls.primary_palette = "Amber"
@@ -153,7 +161,56 @@ class ManifestoApp(MDApp):
         self.c_dialog = None
         self.secret = {}
         self.a_query = ""
+        self.redstr = redstr
+        self.normestr = normestr
+        self.associazionestr = associazionestr
+        self.wb = webbrowser.open
+        self.i_dialog = None
+        Window.bind(on_keyboard=self.key_input)
         return MainScreen()
+
+    def key_input(self, window, key, scancode, codepoint, modifier):
+        if key == 27:
+            self.go_back()
+            return True  # override the default behaviour
+        else:           # the key now does nothing
+            return False
+
+    def share(self, title, text):
+
+        if platform == 'android':
+            
+
+            PythonActivity = autoclass('org.kivy.android.PythonActivity')
+            Intent = autoclass('android.content.Intent')
+            String = autoclass('java.lang.String')
+            intent = Intent()
+            intent.setAction(Intent.ACTION_SEND)
+            intent.putExtra(Intent.EXTRA_TEXT, String('{}'.format(text)))
+            intent.setType('text/plain')
+            chooser = Intent.createChooser(intent, String(title))
+            PythonActivity.mActivity.startActivity(chooser)
+        else :
+            toast("Non implementato...")
+
+
+    def info(self):
+        if not self.i_dialog:
+            self.i_dialog = MDDialog(
+                title="Informazioni",
+                type="custom",
+                size= self.root.size,
+                content_cls=Info(),
+                buttons=[],
+            )
+        self.i_dialog.open()
+
+    def set_toolbar_title_halign(self, *args):
+        self.root.ids.topbar.ids.label_title.halign = "center"
+    def on_start(self):
+        Clock.schedule_once(self.set_toolbar_title_halign)
+        self.root.ids.topbar.ids.label_title.font_name = "Roboto"
+        self.root.ids.topbar.ids.label_title.font_style = "H5"
     def search_prompt(self):
         self.left_action_items = self.root.ids.topbar.left_action_items
         self.right_action_items = self.root.ids.topbar.right_action_items
@@ -180,7 +237,7 @@ class ManifestoApp(MDApp):
         self.root.ids.topbar.remove_widget(self.root.ids.topbar.children[0])
         self.root.ids.topbar.left_action_items = self.left_action_items
         self.root.ids.topbar.right_action_items = self.right_action_items
-        l = scraper.search_scraper(query=str(b.text))
+        l = scraper.search_scraper(query=str(b.text), page=1)
         self.a_query = str(b.text)
 
         self.root.ids.src_scr.children[0].data = l
@@ -221,10 +278,9 @@ class ManifestoApp(MDApp):
        
     def open_article(self,link,title):
         #print("opening-->", link)
-        text, comments , secret, cat, img = scraper.article_scraper(url=link)
-        print(text)
+        aut, text, comments , secret, cat, img = scraper.article_scraper(url=link)
+        #print(text)
         self.secret = secret
-        aut = text.split("\n\n")[1].replace("[", "").replace("]","").replace("**","").replace("#","")
         text = "\n\n".join(text.split("\n\n")[2:])
         #print(text)
 
@@ -279,11 +335,13 @@ class ManifestoApp(MDApp):
         name =b.parent.parent.parent.children[2].children[0].ids.nom.text
         email =b.parent.parent.parent.children[2].children[0].ids.ema.text
         text =b.parent.parent.parent.children[2].children[0].ids.com.text
+        if not len(email) or not len(name):
+            return toast("Compila nome ed email per inviare il commento!")
         if len(text) >= 1500:
             return toast("Il commento può contenere al massimo 1500 caratteri!")
         #print("Sending Comment!->")
         #print(name, email, text)
-        url =   "http://192.168.1.5:5000/" #"https://www.manifestosardo.org/wp-comments-post.php"
+        url =  "https://www.manifestosardo.org/wp-comments-post.php" # "http://192.168.1.5:5000/"
         myobj = {                
                 "author":"+".join(name.split(" ")),
                 "email": email.strip(),
@@ -302,15 +360,16 @@ class ManifestoApp(MDApp):
         try:
 
             x = requests.post(url, data = myobj)
-            #print("resp--->",x.status_code)
-            #print(x.text)
             if x.status_code == 200:
                 toast("Commento inviato...\nIn Attesa di moderazione!")
+                b.parent.parent.parent.children[2].children[0].ids.nom.text = ""
+                b.parent.parent.parent.children[2].children[0].ids.ema.text = ""
+                b.parent.parent.parent.children[2].children[0].ids.com.text = ""
                 self.c_dialog.dismiss()
             else :
                 toast(f"Errore [{str(x.status_code)}]: Commento non inviato!")
         except Exception as e:
-            print("Exceprion: ",e)
+            print("Exception: ",e)
             toast("Verifica la connessione ad internet e riprova!")
                  
 
@@ -319,12 +378,41 @@ class ManifestoApp(MDApp):
         if self.c_dialog : 
             self.c_dialog.dismiss()
 
+    def subscribe(self,email):
+        #print(email)
+        url =   "https://www.manifestosardo.org/newsletter/" #"http://192.168.1.5:5000/" #
+        myobj = {                
+            "EMAIL"  :email.strip(),
+            "_mc4wp_honeypot" :"",
+            "_mc4wp_timestamp"   : "1671710683",
+            "_mc4wp_form_id" : "23141",
+            "_mc4wp_form_element_id":  "mc4wp-form-1",
 
-  
+            }   
+
+        try:
+
+            x = requests.post(url, data = myobj)
+            #print("resp--->",x.status_code)
+            #print(x.text)
+            if x.status_code == 200:
+                toast("Mail in attesa di conferma...\nControlla la tua casella di posta!")
+            else :
+                toast(f"Errore [{str(x.status_code)}]")
+        except Exception as e:
+            print("Exception: ",e)
+            toast("Verifica la connessione ad internet e riprova!")
+                 
+
 
 ManifestoApp().run()
-
-
+"""
+EMAIL   "teonactl@hotmail.it"
+_mc4wp_honeypot ""
+_mc4wp_timestamp    "1671710683"
+_mc4wp_form_id  "23141"
+_mc4wp_form_element_id  "mc4wp-form-1"
+"""
 """
 Successfull post:
 

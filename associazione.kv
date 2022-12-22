@@ -1,0 +1,23 @@
+<AssoScreen@MDScreen>:
+    name: "ass_scr"
+    id : ass_scr
+    ScrollView:
+        size_hint: (1, None)
+        size : (ass_scr.width,ass_scr.height)
+
+        MDGridLayout:
+            height : self.minimum_height
+            cols:1 
+            size_hint_y : None
+
+            padding : 10
+            spacing : 10
+            Image :
+                source : "src/header.png"
+            MDLabel:
+                markup: True
+                padding_y : 10
+                #size_hint_y : None
+                halign: "center"
+                text: app.associazionestr
+                adaptive_height: True
