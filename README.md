@@ -2,6 +2,6 @@
 
 Applicazione ufficiale del Manifesto Sardo 
 
-www.manifestosardo.it
+www.manifestosardo.org
 
 ![](src/header.png)

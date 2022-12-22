@@ -271,7 +271,6 @@ class ManifestoApp(MDApp):
 
 
     def go_back(self):
-        print("go back-->", self.prev_scr)
         if self.root.ids.screen_manager.current == self.prev_scr:
             self.root.ids.screen_manager.current = "bro_scr"  
             self.prev_scr =   "bro_scr"
@@ -296,6 +295,7 @@ class ManifestoApp(MDApp):
         self.root.ids.art_scr.ids.cat_aut_lb.secondary_text  = cat
         self.root.ids.art_scr.ids.image.source  = img
         labels = text.split("\n\n")
+        self.root.ids.art_scr.ids.labelbase.clear_widgets()
         for l in labels:
             #print(l)
             L =   MyLab( text = l)
