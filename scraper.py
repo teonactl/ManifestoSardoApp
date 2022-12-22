@@ -39,8 +39,13 @@ def article_scraper( a_name=False, url = False):
 		secret[sec_list.pop(0)] = "+".join(i["value"].split(" "))
 	catcont = articlehtml.find("div",class_="postmetadata alt")
 	cat =catcont.find("a",rel="category tag")
-	img = articlehtml.find("img")["src"]
-	#print("Article:-> " ,article)
+	try:
+		img = articlehtml.find("img")["src"]
+	except:
+		ifr = articlehtml.find("iframe")
+		yt_id = ifr["src"].split("/")[-1].split("?")[0]
+		#print(yt_id)
+		img= f"https://i.ytimg.com/vi/{yt_id}/maxresdefault.jpg?"
 
 	aut = article.split("\n\n")[1].replace("[", "").replace("]","").replace("**","").replace("#","")
 	if len(aut)> 34 or "foto" in aut.lower() or "immagine" in aut.lower():

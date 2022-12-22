@@ -12,6 +12,7 @@ from kivy.clock import  mainthread, Clock
 from kivymd.toast import toast
 from kivymd.uix.snackbar import Snackbar
 from kivymd.uix.label import MDLabel
+from kivy.uix.videoplayer import VideoPlayer
 
 from kivymd.uix.button import MDFlatButton, MDIconButton
 from kivymd.uix.dialog import MDDialog
@@ -156,6 +157,9 @@ class Info(MDBoxLayout):
     text = StringProperty(info_string)
 class MyLab(MDLabel):
     pass
+class MyButt(MDFlatButton):
+    link = StringProperty()
+
 class ManifestoApp(MDApp):
     def build(self):
         self.theme_cls.primary_palette = "Amber"
@@ -276,7 +280,10 @@ class ManifestoApp(MDApp):
             self.prev_scr =   "bro_scr"
             return
         self.root.ids.screen_manager.current = self.prev_scr
-       
+
+    def openvideo(self,b):
+        self.wb(b.link)
+
     def open_article(self,link,title):
         #print("opening-->", link)
         aut, text, comments , secret, cat, img = scraper.article_scraper(url=link)
@@ -293,9 +300,18 @@ class ManifestoApp(MDApp):
         self.root.ids.art_scr.ids.title_lb.text  = f"[b][color=c77005]{title.strip()}[/color][/b]"
         self.root.ids.art_scr.ids.cat_aut_lb.text  = f"[b]{aut.strip()}[/b]"
         self.root.ids.art_scr.ids.cat_aut_lb.secondary_text  = cat
+
         self.root.ids.art_scr.ids.image.source  = img
         labels = text.split("\n\n")
         self.root.ids.art_scr.ids.labelbase.clear_widgets()
+        if img.startswith("https://i.ytimg."):
+            s = img.split("/")[-2] 
+            sour = "https://www.youtube.com/watch?v="+s
+            print(sour)
+            v = MyButt(link = sour, text="Guarda il Video",on_release=self.openvideo, theme_text_color= 'Custom', md_bg_color = self.theme_cls.primary_color )
+            self.root.ids.art_scr.ids.labelbase.add_widget(v)
+    
+
         for l in labels:
             #print(l)
             L =   MyLab( text = l)
@@ -352,7 +368,7 @@ class ManifestoApp(MDApp):
                 "author":"+".join(name.split(" ")),
                 "email": email.strip(),
                 "url": "",
-                "comment": "+".join(text.split(" ")),
+                "comment": text,
                 "submit": "Invia+commento",
                 "comment_post_ID": self.secret["comment_post_ID"],
                 "leftChars": 1500 - len(text),
