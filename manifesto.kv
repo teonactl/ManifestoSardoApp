@@ -23,6 +23,8 @@
         elevation: 4
         title: "Manifesto Sardo"
         left_action_items: [["menu", lambda x: nav_drawer.set_state("open")]] if screen_manager.current == "bro_scr" else [["arrow-left", lambda x:app.go_back()]]
+        right_action_items : [["magnify", lambda z : app.search_prompt()]] if screen_manager.current == "bro_scr" else []
+
         source : "src/header.png"
         canvas.before:
             Rectangle:
@@ -39,7 +41,13 @@
                 id: bro_scr
             ArticleScreen:
                 id : art_scr
-            Screen3:
+                on_enter : app.clean_tbar()
+            SearchScreen:
+                id : src_scr
+            RedaScreen:  
+
+                id : red_scr
+
 
         MDNavigationDrawer:
 
@@ -60,21 +68,29 @@
                     #icon: "gmail"
                     #right_text: "+99"
                     #text_right_color: "#4a4939"
+                    icon: "newspaper"
                     text: "Articoli"
                     on_release: 
                         screen_manager.current = "bro_scr"
                         nav_drawer.set_state("close")
 
                 DrawerClickableItem:
-                    #icon: "send"
-                    text: "Screen 3"
+                    icon: "users"
+                    text: "Redazione"
                     on_release: 
-                        screen_manager.current = "screen3"
+                        screen_manager.current = "red_scr"
                         nav_drawer.set_state("close")
-
-
+                DrawerClickableItem:
+                    icon: "envelope"
+                    text: "Contatti"
+                    on_release: 
+                        screen_manager.current = "src_scr"
+                        nav_drawer.set_state("close")
                 MDNavigationDrawerDivider:
 
                 DrawerLabelItem:
                     icon: "information-outline"
                     text: "Info"
+                    on_release: 
+                        nav_drawer.set_state("close")
+            

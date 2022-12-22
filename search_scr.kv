@@ -1,0 +1,41 @@
+<SearchScreen@MDScreen>:
+    name :"src_scr"
+    id : src_scr
+    SearchViewer : 
+        viewclass: 'SrCard'  
+        orientation: "vertical"
+        padding:10, 10
+        margin : 20
+        #space_x: self.size[0]/3 
+        size_hint_y : self.parent.size_hint_y
+        id : rvs
+
+        RecycleGridLayout:
+            color:(0, 0.7, 0.4, 0.8)
+            default_size: None, None
+            default_size_hint: 1, None
+            padding : (10,10)
+            size_hint_y: None
+            height: self.minimum_height
+            cols: 1
+            spacing: 10
+
+
+<SrCard>
+    #id : card
+    style : "elevated"
+    shadow_softness: 12
+    shadow_offset : (0, 2)
+    orientation : "vertical"
+    margin : 10
+    padding : 10
+    line_color : "yellow"
+    #height : self.height + text_lb.height
+    TwoLineListItem:
+        text : root.title
+        secondary_text: root.date
+        pos_hint: {"center_y": .5}
+        _no_ripple_effect: True
+        multiline : True
+        padding_y : 10
+        on_press: app.open_article(root.link, root.title)

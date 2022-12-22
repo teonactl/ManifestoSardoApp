@@ -12,7 +12,7 @@
 
         RecycleGridLayout:
             color:(0, 0.7, 0.4, 0.8)
-            default_size: None, dp(500)
+            default_size: None, None #dp(500)
             default_size_hint: 1, None
             padding : (10,10)
             size_hint_y: None
@@ -30,8 +30,10 @@
     margin : 10
     padding : 10
     line_color : "yellow"
-    #height : self.height + text_lb.height
+    on_press : print(tex.height+smt.height, text_lb.texture_size[1])
+    height: 418+ text_lb.texture_size[1]
     ThreeLineListItem:
+        id : tex
         text : root.date
         secondary_text:f"[b]{root.auth}[/b]"
         tertiary_text: root.title
@@ -40,6 +42,7 @@
         multiline : True
         padding_y : 10
     MDBoxLayout:
+        id :smt
         orientation : "vertical"
         padding : 10
         MDSmartTile:
@@ -50,9 +53,9 @@
             mipmap:True
             keep_ratio:True
             no_cache : False
-            on_press: app.open_article(root.link, root.title, root.cat, root.img)
+            on_press: app.open_article(root.link, root.title)
             lines : 1
-      
+        
             MDLabel:
                 markup : True
                 radius : 24, 24
@@ -67,3 +70,4 @@
             text : root.text
             height: self.texture_size[1]
 
+        

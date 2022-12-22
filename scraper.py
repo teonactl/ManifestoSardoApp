@@ -4,7 +4,7 @@ from bs4 import BeautifulSoup
 from datetime import datetime
 from datetime import datetime
 from markdownify import MarkdownConverter
-
+import re
 
 def md(soup, **options):
     return MarkdownConverter(**options).convert_soup(soup)
@@ -27,23 +27,36 @@ def article_scraper( a_name=False, url = False):
 	if com_ol:
 		coms = com_ol.find_all("li")
 		for c in coms:
-			print("comment text-->", c.find_all("p"))
+			#print("comment text-->", c.find_all("p"))
 			co = {}
 			co["auth"] = c.find("cite").text
 			co["text"] = "\n\n".join([x.text for x in  c.find_all("p")])
 			comments.append(co)
-	p_list = articlehtml.find_all("p")
+	p_list = articlehtml.find_all(["p"])
+	print(p_list)
+	t = "".join([p.text for p in p_list])
+
+	if not len(t.strip()) :
+		p_list = articlehtml.find_all("div")
+		p_list = [p_list[0]]
+	#print("AUT_>",aut)
 	for i in p_list:
 		l.append( md(i,strip=['a','img']))
+	#print(l)
+	nl = list( dict.fromkeys(l) )
 	#print(comments)
-	article = "\n\n".join(l)
+	article = "\n\n".join(nl)
 	secret = {}
 	sec_list = ["submit","comment_post_ID","wantispam_t"]
 	inputs = [ i for i in form.find_all("input") if i["name"] in  sec_list]
 	for i in inputs:
 		secret[sec_list.pop(0)] = "+".join(i["value"].split(" "))
-	#print(secret)
-	return article, comments , secret
+	catcont = articlehtml.find("div",class_="postmetadata alt")
+	cat =catcont.find("a",rel="category tag")
+	#print("cat-->", cat.text)
+	img = articlehtml.find("img")["src"]
+	#print("Img", img)
+	return article, comments , secret, cat.text, img
 
 #article_scraper()
 
@@ -70,7 +83,7 @@ def timeline_scraper(page = ""):
 						auth = sp.text 
 				if auth == None:
 					h5 = entry.find_all("h5")
-					print(h5)
+					#print(h5)
 					for sp in h5:
 						if hasattr( sp, "text" ):
 							auth = sp.text 
@@ -94,19 +107,19 @@ def timeline_scraper(page = ""):
 			art["cat"] = a.find("a", rel="category tag").text
 			art["title"] = a.find("a", rel= "bookmark").text
 			art["auth"] =  auth
-			art["text"] = text+ " ..."
+			art["text"] = text+ "..."
 
 			try : 
 				img =  entry.find("img")["src"]
 				#print(img)
 			except :
-				print("Video?")
-				print(art["title"])
+				#print("Video?")
+				#print(art["title"])
 				fig = entry.find("figure")
 				ifr = fig.find("iframe")
-				print(ifr["src"])
+				#print(ifr["src"])
 				yt_id = ifr["src"].split("/")[-1].split("?")[0]
-				print(yt_id)
+				#print(yt_id)
 				img= f"https://i.ytimg.com/vi/{yt_id}/maxresdefault.jpg?"
 
 			art["img"] = img
@@ -124,5 +137,34 @@ def timeline_scraper(page = ""):
 
 	return a_list
 
-p = timeline_scraper("300")
+#p = timeline_scraper("300")
 #print(p)
+
+def search_scraper(query=""):
+	sr_url = "https://www.manifestosardo.org/?s="+ "+".join(query.split(" "))
+	page = requests.get(sr_url)
+	soup = BeautifulSoup(page.content, "html.parser")
+	articlelist = soup.find_all("div", class_="post")
+	a_list = []
+	for a in articlelist:
+		art = {}
+		entry = a.find("a", rel= "bookmark")
+		d = a.find("small")
+		art["title"]= entry.text
+		#print(art["title"])
+		if re.match(r"Il numero \d", art["title"]):
+			#print("match")
+			continue
+		art["link"] = entry["href"]
+		art["date"] = d.text
+		dateit = art["date"].strip().replace("Gennaio", "1").replace("Febbraio", "2").replace("Marzo", "3").replace("Aprile","4").replace("Maggio","5").replace("Giugno","6").replace("Luglio","7").replace("Agosto","8").replace("Settembre","9").replace("Ottobre","10").replace("Novembre", "11").replace("Dicembre","12")
+		art["datetime"] =datetime.strptime(dateit.strip(), "%d %m %Y")
+
+		#print("title: ",entry.text)
+		#print("link: ",entry["href"])
+		#print("date: ",d.text)
+		a_list.append(art)
+	return a_list
+
+
+#p = search_scraper("prova prova")

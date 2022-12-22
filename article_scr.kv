@@ -1,7 +1,7 @@
 <ArticleScreen@MDScreen>:
     name: "art_scr"
     id : art_scr
-    on_enter : sv.scroll_y = 1
+    on_leave : sv.scroll_y = 1
 
     ScrollView:
         id : sv
@@ -21,8 +21,8 @@
                 id : title_lb
                 size_hint_y : None
                 halign: "center"
-            OneLineListItem:
-                id : cat_lb
+            TwoLineListItem:
+                id : cat_aut_lb
             AsyncImage:
                 source: ""
                 id : image
@@ -34,6 +34,7 @@
                 height: text_lb.texture_size[1]
 
                 MDLabel:
+                    font_name : "Roboto"
                     id: text_lb
                     markup: True
                     #size_hint_y : None
