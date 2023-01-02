@@ -22,7 +22,7 @@ from kivymd.uix.textfield import MDTextField
 from kivy.core.text import LabelBase
 from kivymd.uix.dialog import MDDialog
 from kivy import platform
-
+from kivy.metrics import dp
 import requests
 import threading
 import re
@@ -287,41 +287,41 @@ class ManifestoApp(MDApp):
     def open_article(self,link,title):
         #print("opening-->", link)
         aut, text, comments , secret, cat, img = scraper.article_scraper(url=link)
-        #print(text)
+        #print("main",text)
         self.secret = secret
-        text = "\n\n".join(text.split("\n\n")[2:])
-        #print(text)
 
-        text = text.replace("**[","[b]").replace("]**","[/b]")
-        text = re.sub(r"\*\*(.*?)\*\*",r"[b]\1[/b]", text)
-        text = re.sub(r"\\\*",r"[sup]#[/sup]", text)
-        text = re.sub(r"\*(.*?)\*",r"[i]\1[/i]", text)
-        text = re.sub(r"(?=Questo)(.*?)(?<=sito)","", text,flags=re.S)
         self.root.ids.art_scr.ids.title_lb.text  = f"[b][color=c77005]{title.strip()}[/color][/b]"
         self.root.ids.art_scr.ids.cat_aut_lb.text  = f"[b]{aut.strip()}[/b]"
         self.root.ids.art_scr.ids.cat_aut_lb.secondary_text  = cat
 
         self.root.ids.art_scr.ids.image.source  = img
-        labels = text.split("\n\n")
+        #print("sub",text)
+        labels = re.split("\n+", text) #text.strip().split("\n\n\n")
+        #print("text",text)
+        #print("labels",labels)
         self.root.ids.art_scr.ids.labelbase.clear_widgets()
         if img.startswith("https://i.ytimg."):
             s = img.split("/")[-2] 
             sour = "https://www.youtube.com/watch?v="+s
-            print(sour)
+            #print(sour)
             v = MyButt(link = sour, text="Guarda il Video",on_release=self.openvideo, theme_text_color= 'Custom', md_bg_color = self.theme_cls.primary_color )
             self.root.ids.art_scr.ids.labelbase.add_widget(v)
     
 
-        for l in labels:
-            #print(l)
-            L =   MyLab( text = l)
+        for text in labels:
+            #print("lab",text)
+            text = text.replace("**[","[b]").replace("]**","[/b]")
+            text = re.sub(r"\*\*(.*?)\*\*",r"[b]\1[/b] ", text)
+            text = re.sub(r"\\\*",r"[sup]#[/sup]", text)
+            text = re.sub(r"\*(.*?)\*",r"[i]\1[/i] ", text)
+       
+            L =   MyLab( text = text+"\n\n")
             self.root.ids.art_scr.ids.labelbase.add_widget(L)
-        self.root.ids.art_scr.ids.comment_grid.clear_widgets()
+            #self.root.ids.art_scr.ids.labelbase.add_widget(N)
 
+        self.root.ids.art_scr.ids.comment_grid.clear_widgets()
         if not len(comments):
             self.root.ids.screen_manager.current = "art_scr"
-            #self.prev_scr = "art_scr"
-
             return
         for c in comments:
             com = Comment(auth=c["auth"], text=c["text"])

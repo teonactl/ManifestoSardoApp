@@ -32,6 +32,9 @@ def article_scraper( a_name=False, url = False):
 			comments.append(co)
 	entry =  articlehtml.find("div", class_="entry")
 	article = md(entry,strip=['a','img']) 
+	text = "\n\n".join(article.split("\n\n")[2:])
+
+	#print(article)
 	secret = {}
 	sec_list = ["submit","comment_post_ID","wantispam_t"]
 	inputs = [ i for i in form.find_all("input") if i["name"] in  sec_list]
@@ -39,19 +42,36 @@ def article_scraper( a_name=False, url = False):
 		secret[sec_list.pop(0)] = "+".join(i["value"].split(" "))
 	catcont = articlehtml.find("div",class_="postmetadata alt")
 	cat =catcont.find("a",rel="category tag")
-	try:
-		img = articlehtml.find("img")["src"]
-	except:
-		ifr = articlehtml.find("iframe")
-		yt_id = ifr["src"].split("/")[-1].split("?")[0]
-		#print(yt_id)
-		img= f"https://i.ytimg.com/vi/{yt_id}/maxresdefault.jpg?"
-
 	aut = article.split("\n\n")[1].replace("[", "").replace("]","").replace("**","").replace("#","")
 	if len(aut)> 34 or "foto" in aut.lower() or "immagine" in aut.lower():
 		aut =article.split("\n\n")[2].replace("[", "").replace("]","").replace("**","").replace("#","")
-	#print("Aut->", aut)
-	return aut, article, comments , secret, cat.text, img
+
+	try:
+		img = articlehtml.find("img")["src"]
+	except:
+		try:
+			ifr = articlehtml.find("iframe")
+			yt_id = ifr["src"].split("/")[-1].split("?")[0]
+			#print(yt_id)
+			img= f"https://i.ytimg.com/vi/{yt_id}/maxresdefault.jpg?"
+		except:
+			img = "https://www.manifestosardo.org/wp-content/themes/manifesto_sardo/images/logo_manifesto_sardo.jpg"
+			aut =  article.split("\n\n")[0].replace("[", "").replace("]","").replace("**","").replace("#","")
+			text = "\n\n".join(article.split("\n\n")[1:])
+
+	text = re.sub(r"(?=Questo articolo è stato pubblicato)(.*?)(?<=sito)","", text,flags=re.S)
+
+	if not len(text.replace(".","").replace(",", "").strip()):
+		print("not len!")
+		text = re.sub(r"(?=Questo articolo è stato pubblicato)(.*?)(?<=sito)","", article,flags=re.S).replace("#","")
+
+
+		#text = "\n\n".join(article.split("\n\n")[1:])
+
+
+	
+	print("Art->", text)
+	return aut, text, comments , secret, cat.text, img
 
 #article_scraper()
 from kivymd.toast import toast
@@ -96,7 +116,7 @@ def timeline_scraper(page = ""):
 				if tex[-1].text.endswith("Continua »"):
 					text = tex[-1].text[0:-10]
 				else : 
-					text = tex[-1].text
+					text =tex[-1].text
 
 			date = a.find("small").text
 			dateit = date.replace("Gennaio", "1").replace("Febbraio", "2").replace("Marzo", "3").replace("Aprile","4").replace("Maggio","5").replace("Giugno","6").replace("Luglio","7").replace("Agosto","8").replace("Settembre","9").replace("Ottobre","10").replace("Novembre", "11").replace("Dicembre","12")
